@@ -46,7 +46,7 @@ exports.postComment = async(req, res) => {
                 photo_id: photo_id,
             })
             .then((result) => {
-                res.status(200).json({
+                res.status(201).json({
                     comment: result,
                 });
             })
