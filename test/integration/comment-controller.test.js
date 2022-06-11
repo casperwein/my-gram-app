@@ -6,15 +6,14 @@ const { sequelize } = require("../../models")
 const secretKey = "secret";
 
 const adminUser = {
-    "email": "kroos@gmail.com",
-    "password": "kroos"
+    "email": "dimas@gmail.com",
+    "password": "dimas"
 }
 
-const comment = ''
+const comment = 'comment'
 let user_id = ''
-const photo_id = 3
-const comment_id = ''
-let token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImVtYWlsIjoia3Jvb3NAZ21haWwuY29tIiwiZnVsbF9uYW1lIjoia3Jvb3MiLCJ1c2VybmFtZSI6Imtyb29zIiwicHJvZmlsZV9pbWFnZV91cmwiOiJodHRwczovL2p3dC5pby8iLCJhZ2UiOjQ1LCJwaG9uZV9udW1iZXIiOjMyMzQ1MzQsImlhdCI6MTY1NDc2NDc4NSwiZXhwIjoxNjU0NzY4Mzg1fQ.iKgzVFeBGEiL1fLo2MY0JGAg1kJFr7MUq6ouBXo6W14'
+const photo_id = 1
+let token = ''
 
 const commentData = {
     comment: comment,
@@ -22,9 +21,18 @@ const commentData = {
     photo_id: photo_id
 }
 
+const failedData = {
+    comment: '',
+    user_id: user_id,
+    photo_id: photo_id
+}
+
+const failedCommentData = {
+    photo_id
+}
 
 beforeAll(done => {
-    request(app).post("/users")
+    request(app).post("/users/login")
         .send(adminUser)
         .end((error, res) => {
             if (error) done(error)
@@ -40,25 +48,130 @@ beforeAll(done => {
 })
 
 
-describe('comment post Comment', () => {
+
+describe('comment getAll comment', () => {
+    it("should return 200 status code", (done) => {
+        request(app).get("/comments")
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
+
+
+describe('comment postComment', () => {
     it("should return 201 status code", (done) => {
         request(app).post("/comments")
             .set('authentication', `${ token }`)
             .send(commentData)
             .then(res => {
-                comment_id = res.body.comment.id
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
-                expect(res.body.comment.photo_id).toEqual(comment.photo_id)
-                expect(typeof res.body.comment.user_id).toEqual("number")
+                expect(res.body.comment.photo_id).toEqual(commentData.photo_id)
                 expect(res.body.comment.comment).toEqual(commentData.comment)
+                expect(typeof res.body.comment.user_id).toEqual("number")
                 done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 401 status code", (done) => {
+        request(app)
+            .post('/comments')
+            .set('auth', `${token}`)
+            .send(failedCommentData)
+            .then(res => {
+                expect(res.status).toEqual(401)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+            .catch(err => {
+                done(err)
+            })
+    })
+
+    it("should return 503 status code", (done) => {
+        request(app).post("/comments")
+            .set('authentication', `${ token }`)
+            .send(failedData)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                done()
+            }).catch(error => {
+                done(error)
             })
     })
 })
 
+
+describe('comment updateComment', () => {
+    it("should return 200 status code", (done) => {
+        request(app).put(`/comments/${photo_id}`)
+            .set('authentication', `${ token }`)
+            .send(commentData)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                    // expect(res.body.comment.photo_id).toEqual(commentData.photo_id)
+                    // expect(res.body.comment.comment).toEqual(commentData.comment)
+                    // expect(typeof res.body.comment.user_id).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 503 status code", (done) => {
+        request(app).put(`/comments/${photo_id}`)
+            .set('authentication', `${ token }`)
+            .send(failedData)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
+
+
+describe('comment deleteComment', () => {
+    it("should return 200 status code", (done) => {
+        request(app).delete(`/comments/${photo_id}`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 503 status code", (done) => {
+        request(app).delete(`/comments/${photo_id}`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
+
+
 afterAll(done => {
-    sequelize.queryInterface.bulkDelete('comment', null, {
+    sequelize.queryInterface.bulkDelete('comments', null, {
             truncate: true,
             restartIdentity: true
         })

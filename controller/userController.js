@@ -46,7 +46,7 @@ exports.signUp = async(req, res) => {
                     };
                     const token = generateToken(data);
                     res.status(201).send({
-                        token: token,
+                        user: data,
                     });
                 })
                 .catch((error) => {
