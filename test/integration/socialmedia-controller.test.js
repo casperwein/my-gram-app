@@ -4,32 +4,14 @@ const app = require("../../index")
 const { sequelize } = require("../../models")
 
 const secretKey = "secret";
+let user_id = ''
+let token = ''
+let socialMediaId = 1
+let id_not_found = 0
 
 const user = {
     "email": "dimas@gmail.com",
     "password": "dimas"
-}
-
-const comment = 'comment'
-let user_id = ''
-const photo_id = 1
-let token = ''
-let id_not_found = 0;
-
-const commentData = {
-    comment: comment,
-    user_id: user_id,
-    photo_id: photo_id
-}
-
-const failedData = {
-    comment: '',
-    user_id: user_id,
-    photo_id: photo_id
-}
-
-const failedCommentData = {
-    photo_id
 }
 
 beforeAll(done => {
@@ -48,10 +30,21 @@ beforeAll(done => {
         })
 })
 
+const socialMediaData = {
+    name: "twitter",
+    social_media_url: "https://www.twitter.com/",
+    user_id: user_id
+}
 
-describe('comment getAll comment', () => {
+const failedData = {
+    name: '',
+    social_media_url: 'x',
+    user_id: user_id
+}
+
+describe('socialMedias getAllSocialMedias', () => {
     it("should return 200 status code", (done) => {
-        request(app).get("/comments")
+        request(app).get("/socialmedias")
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(200)
@@ -66,34 +59,18 @@ describe('comment getAll comment', () => {
     })
 })
 
-describe('comment postComment', () => {
-    it("should return 201 status code", (done) => {
-        request(app).post("/comments")
-            .set('authentication', `${ token }`)
-            .send(commentData)
+describe('socialMedia post socialMedia', () => {
+    it("should return 201", (done) => {
+        request(app)
+            .post('/socialmedias')
+            .set('authentication', `${token}`)
+            .send(socialMediaData)
             .then(res => {
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
-                expect(res.body.comment.photo_id).toEqual(commentData.photo_id)
-                expect(res.body.comment.comment).toEqual(commentData.comment)
-                expect(typeof res.body.comment.user_id).toEqual("number")
-                done()
-            }).catch(error => {
-                done(error)
-            })
-    })
-
-    it("should return 401 status code", (done) => {
-        request(app)
-            .post('/comments')
-            .set('auth', `${token}`)
-            .send(failedCommentData)
-            .then(res => {
-                expect(res.status).toEqual(401)
-                expect(typeof res.body).toEqual("object")
-                expect(typeof res.body.message).not.toEqual("object")
-                expect(typeof res.body.message).not.toEqual("number")
-                expect(typeof res.status).toEqual("number")
+                expect(res.body.socialmedias.social_media_url).toEqual(socialMediaData.social_media_url)
+                expect(res.body.socialmedias.name).toEqual(socialMediaData.name)
+                expect(typeof res.body.socialmedias.user_id).toEqual("number")
                 done()
             })
             .catch(err => {
@@ -102,7 +79,7 @@ describe('comment postComment', () => {
     })
 
     it("should return 503 status code", (done) => {
-        request(app).post("/comments")
+        request(app).post("/socialmedias")
             .set('authentication', `${ token }`)
             .send(failedData)
             .then(res => {
@@ -118,32 +95,32 @@ describe('comment postComment', () => {
     })
 })
 
-describe('comment updateComment', () => {
+describe('socialmedia updatesocialmedia', () => {
     it("should return 200 status code", (done) => {
-        request(app).put(`/comments/${photo_id}`)
+        request(app).put(`/socialmedias/${socialMediaId}`)
             .set('authentication', `${ token }`)
-            .send(commentData)
+            .send(socialMediaData)
             .then(res => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
-                expect(typeof res.body.comment).toEqual("object")
-                expect(typeof res.body.comment).not.toEqual("number")
-                expect(typeof res.status).toEqual("number")
+                expect(res.body.socialmedias[0].social_media_url).toEqual(socialMediaData.social_media_url)
+                expect(res.body.socialmedias[0].name).toEqual(socialMediaData.name)
+                expect(typeof res.body.socialmedias[0].id).toEqual("number")
                 done()
             }).catch(error => {
                 done(error)
             })
     })
 
-    it("should return 401 status code id not found", (done) => {
-        request(app).delete(`/comments/${id_not_found}`)
+    it("should return 401 status code", (done) => {
+        request(app).put(`/socialmedias/${id_not_found}`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
                 expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
                 expect(typeof res.status).toEqual("number")
-                expect(res.body.message).toEqual("id not found")
                 done()
             }).catch(error => {
                 done(error)
@@ -151,14 +128,14 @@ describe('comment updateComment', () => {
     })
 
     it("should return 503 status code", (done) => {
-        request(app).put(`/comments/${photo_id}`)
+        request(app).put(`/socialmedias/${socialMediaId}`)
             .set('authentication', `${ token }`)
             .send(failedData)
             .then(res => {
                 expect(res.status).toEqual(503)
                 expect(typeof res.body).toEqual("object")
                 expect(typeof res.body.message).toEqual("string")
-                expect(typeof res.body.message).not.toEqual("object")
+                expect(typeof res.body.message).not.toEqual("number")
                 expect(typeof res.status).toEqual("number")
                 done()
             }).catch(error => {
@@ -167,31 +144,28 @@ describe('comment updateComment', () => {
     })
 })
 
-describe('comment deleteComment', () => {
+describe('socialmedias deleteSocialMedia', () => {
     it("should return 200 status code", (done) => {
-        request(app).delete(`/comments/${photo_id}`)
+        request(app).delete(`/socialmedias/${socialMediaId}`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
-                expect(typeof res.body.message).toEqual("string")
-                expect(res.body.message).toEqual("Your comments has been succesfully deleted")
-                expect(typeof res.status).toEqual("number")
                 done()
             }).catch(error => {
                 done(error)
             })
     })
 
-    it("should return 401 status code id not found", (done) => {
-        request(app).delete(`/comments/${id_not_found}`)
+    it("should return 401 status code", (done) => {
+        request(app).delete(`/socialmedias/${id_not_found}`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
                 expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
                 expect(typeof res.status).toEqual("number")
-                expect(res.body.message).toEqual("id not found")
                 done()
             }).catch(error => {
                 done(error)
@@ -199,7 +173,7 @@ describe('comment deleteComment', () => {
     })
 
     it("should return 503 status code", (done) => {
-        request(app).delete(`/comments/bukanid`)
+        request(app).delete(`/socialmedias/bukanid`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(503)
@@ -215,7 +189,7 @@ describe('comment deleteComment', () => {
 })
 
 afterAll(done => {
-    sequelize.queryInterface.bulkDelete('comments', null, {
+    sequelize.queryInterface.bulkDelete('socialmedia', null, {
             truncate: true,
             restartIdentity: true
         })
