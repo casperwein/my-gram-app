@@ -71,7 +71,7 @@ exports.updateComments = async(req, res) => {
         })
         .then((comments) => {
             res.status(200).json({
-                comments: comments[1],
+                comment: comments[1],
             });
         })
         .catch((error) => {

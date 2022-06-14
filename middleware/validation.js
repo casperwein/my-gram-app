@@ -65,64 +65,6 @@ class userValidation {
     }
 }
 
-class photoValidation {
-    static async postAndUpdatePhoto(req, res, next) {
-        const schema = Joi.object().keys({
-            title: Joi.string().required(),
-            caption: Joi.string().required(),
-            poster_image_url: Joi.string().uri().required(),
-        });
-        try {
-            await schema.validateAsync(req.body);
-            next();
-        } catch (err) {
-            res.status(401).json({
-                message: "invalid user input",
-                error: err.message,
-            });
-        }
-    }
-}
-
-class socialMediaValidation {
-    static async SocialMedia(req, res, next) {
-        const schema = Joi.object().keys({
-            name: Joi.string().required(),
-            social_media_url: Joi.string().uri().required(),
-        });
-        try {
-            await schema.validateAsync(req.body);
-            next();
-        } catch (error) {
-            res.status(401).json({
-                message: "invalid user input",
-                error: err.message,
-            });
-        }
-    }
-}
-
-class commentsValidation {
-    static async Comments(req, res, next) {
-        const schema = Joi.object().keys({
-            comment: Joi.string().required(),
-            photo_id: Joi.number().required(),
-        });
-        try {
-            await schema.validateAsync(req.body);
-            nexr();
-        } catch (error) {
-            res.status(401).json({
-                message: "invalid user input",
-                error: err.message,
-            });
-        }
-    }
-}
-
 module.exports = {
-    userValidation,
-    photoValidation,
-    commentsValidation,
-    socialMediaValidation,
+    userValidation
 };

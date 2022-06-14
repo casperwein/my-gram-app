@@ -47,7 +47,7 @@ exports.postPhoto = async(req, res) => {
             user_id: user_id,
         })
         .then((photo) => {
-            res.status(201).send({
+            res.status(201).json({
                 id: photo.id,
                 title: photo.title,
                 poster_image_url: photo.poster_image_url,
