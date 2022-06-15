@@ -11,7 +11,8 @@ const user = {
 }
 
 let user_id = ''
-const photo_id = 1
+let photoId = ''
+const id_not_found = 0
 let token = ''
 
 const photoData = {
@@ -51,6 +52,7 @@ describe('photo postPhoto', () => {
             .set('authentication', `${token}`)
             .send(photoData)
             .then(res => {
+                photoId = res.body.id
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
                 expect(res.body.title).toEqual(photoData.title)
@@ -63,21 +65,119 @@ describe('photo postPhoto', () => {
             })
     })
 
-    // it("should return 503 status code", (done) => {
-    //     request(app).post("/photos")
-    //         .set('authentication', `${ token }`)
-    //         .send(failedData)
-    //         .then(res => {
-    //             expect(res.status).toEqual(503)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         }).catch(error => {
-    //             done(error)
-    //         })
-    // })
+    it("should return 503 status code", (done) => {
+        request(app).post("/photos")
+            .set('authentication', `${ token }`)
+            .send(failedData)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
+
+describe('photo updatePhoto', () => {
+    it("should return 200 status code", (done) => {
+        request(app).put(`/photos/${photoId}`)
+            .set('authentication', `${ token }`)
+            .send(photoData)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.photos).toEqual("object")
+                expect(typeof res.body.photos).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 401 status code id not found", (done) => {
+        request(app).delete(`/comments/${id_not_found}`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(401)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.status).toEqual("number")
+                expect(res.body.message).toEqual("id not found")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 503 status code", (done) => {
+        request(app).put(`/photos/${photoId}`)
+            .set('authentication', `${ token }`)
+            .send(failedData)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).not.toEqual("boolean")
+                expect(typeof res.body.message).not.toEqual("object")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
 })
 
 
+describe('Photo deletephoto', () => {
+    it("should return 200 status code", (done) => {
+        request(app).delete(`/photos/${photoId}`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(res.body.message).toEqual("Your Photo has been succesfully deleted")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 401 status code", (done) => {
+        request(app).delete(`/photos/${id_not_found}`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(401)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+
+    it("should return 503 status code", (done) => {
+        request(app).delete(`/photos/abcdef`)
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
 
 afterAll(done => {
     sequelize.queryInterface.bulkDelete('photos', null, {

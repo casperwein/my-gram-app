@@ -12,7 +12,7 @@ const user = {
 
 const comment = 'comment'
 let user_id = ''
-const photo_id = 1
+const photo_id = 1 // post photo terlebih dahulu
 let token = ''
 let id_not_found = 0;
 
