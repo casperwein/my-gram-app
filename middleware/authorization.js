@@ -6,8 +6,10 @@ const SocialMedia = require("../models/index").socialmedia;
 const userAuthorization = async(req, res, next) => {
     const userId = req.params.userId;
     const user_id = req.id;
+    console.log(userId)
+    console.log(user_id)
 
-    await User.findOne({ where: { id: userId } })
+    await User.findOne({ where: { id: user_id } })
         .then((user) => {
             if (!user) {
                 res.status(401).json({
@@ -48,7 +50,6 @@ const photoAuthorization = async(req, res, next) => {
             }
         })
         .catch((error) => {
-            console.log(error);
             res.status(503).json({
                 message: "INTERNAL SERVER ERROR",
             });
@@ -75,7 +76,6 @@ const commentAuthorization = async(req, res, next) => {
             }
         })
         .catch((error) => {
-            console.log(error);
             res.status(503).json({
                 message: "INTERNAL SERVER ERROR",
             });
@@ -101,7 +101,6 @@ const socialMediaAuthorization = async(req, res, next) => {
             }
         })
         .catch((error) => {
-            console.log(error);
             res.status(503).json({
                 message: "INTERNAL SERVER ERROR",
             });

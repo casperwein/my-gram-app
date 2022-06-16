@@ -45,6 +45,24 @@ beforeAll(done => {
         })
 })
 
+
+describe('photos getAllPhotos', () => {
+    it("should return 200 status code", (done) => {
+        request(app).get("/photos")
+            .set('authentication', `${ token }`)
+            .then(res => {
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.comment).not.toEqual("number")
+                expect(typeof res.body.comment).not.toEqual("boolean")
+                expect(typeof res.body.comment).not.toEqual("string")
+                done()
+            }).catch(error => {
+                done(error)
+            })
+    })
+})
+
 describe('photo postPhoto', () => {
     it("should return 201", (done) => {
         request(app)

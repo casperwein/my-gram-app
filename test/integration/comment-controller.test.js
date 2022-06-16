@@ -10,6 +10,7 @@ const user = {
     "password": "dimas"
 }
 
+let commentId = ''
 const comment = 'comment'
 let user_id = ''
 const photo_id = 1 // post photo terlebih dahulu
@@ -21,6 +22,7 @@ const commentData = {
     user_id: user_id,
     photo_id: photo_id
 }
+
 
 const failedData = {
     comment: '',
@@ -72,6 +74,7 @@ describe('comment postComment', () => {
             .set('authentication', `${ token }`)
             .send(commentData)
             .then(res => {
+                commentId = res.body.comment.id
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
                 expect(res.body.comment.photo_id).toEqual(commentData.photo_id)
@@ -120,7 +123,7 @@ describe('comment postComment', () => {
 
 describe('comment updateComment', () => {
     it("should return 200 status code", (done) => {
-        request(app).put(`/comments/${photo_id}`)
+        request(app).put(`/comments/${commentId}`)
             .set('authentication', `${ token }`)
             .send(commentData)
             .then(res => {
@@ -136,7 +139,7 @@ describe('comment updateComment', () => {
     })
 
     it("should return 401 status code id not found", (done) => {
-        request(app).delete(`/comments/${id_not_found}`)
+        request(app).put(`/comments/${id_not_found}`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(401)
@@ -151,7 +154,7 @@ describe('comment updateComment', () => {
     })
 
     it("should return 503 status code", (done) => {
-        request(app).put(`/comments/${photo_id}`)
+        request(app).put(`/comments/kejre`)
             .set('authentication', `${ token }`)
             .send(failedData)
             .then(res => {
@@ -169,7 +172,7 @@ describe('comment updateComment', () => {
 
 describe('comment deleteComment', () => {
     it("should return 200 status code", (done) => {
-        request(app).delete(`/comments/${photo_id}`)
+        request(app).delete(`/comments/${commentId}`)
             .set('authentication', `${ token }`)
             .then(res => {
                 expect(res.status).toEqual(200)
