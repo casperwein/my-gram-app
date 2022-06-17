@@ -197,11 +197,11 @@ describe('Photo deletephoto', () => {
     })
 })
 
-afterAll(done => {
-    sequelize.queryInterface.bulkDelete('photos', null, {
-            truncate: true,
-            restartIdentity: true
-        })
-        .then(() => done())
-        .catch(error => done(error))
-})
+// afterAll(done => {
+//     sequelize.queryInterface.bulkDelete('photos', null, {
+//             // truncate: true,
+//             // restartIdentity: true
+//         })
+//         .then(() => done())
+//         .catch(error => done(error))
+// })

@@ -13,7 +13,7 @@ const user = {
 let commentId = ''
 const comment = 'comment'
 let user_id = ''
-const photo_id = 1 // post photo terlebih dahulu
+const photo_id = 1 // seeding photo terlebih dahulu
 let token = ''
 let id_not_found = 0;
 
@@ -31,7 +31,8 @@ const failedData = {
 }
 
 const failedCommentData = {
-    photo_id
+    photo_id: 0,
+    comment
 }
 
 beforeAll(done => {
@@ -89,7 +90,7 @@ describe('comment postComment', () => {
     it("should return 401 status code", (done) => {
         request(app)
             .post('/comments')
-            .set('auth', `${token}`)
+            .set('authentication', `${token}`)
             .send(failedCommentData)
             .then(res => {
                 expect(res.status).toEqual(401)

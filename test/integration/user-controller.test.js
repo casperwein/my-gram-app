@@ -6,8 +6,8 @@ const { sequelize } = require("../../models")
 const secretKey = "secret";
 
 const userData = {
-    "email": "doni@gmail.com",
-    "password": "doni"
+    "email": "dinda@gmail.com",
+    "password": "dinda"
 }
 
 const userDataFailed = {
@@ -23,6 +23,7 @@ const userDataFailedlogin = {
 let userId = ''
 const id_not_found = 0
 let token = ''
+const notAuthorized = 1
 
 const dataRegistrasiFailed = {
     full_name: "dimas",
@@ -35,19 +36,19 @@ const dataRegistrasiFailed = {
 }
 
 const updateUser = {
-    full_name: "doni",
-    email: "doni@gmail.com",
-    username: "doni",
+    full_name: "dinda",
+    email: "dinda@gmail.com",
+    username: "dinda",
     profile_image_url: "https://github.com/",
     age: 45,
     phone_number: 3234534
 }
 
 const dataRegistrasiNewUser = {
-    full_name: "doni",
-    email: "doni@gmail.com",
-    username: "doni",
-    password: "doni",
+    full_name: "dinda",
+    email: "dinda@gmail.com",
+    username: "dinda",
+    password: "dinda",
     profile_image_url: "https://github.com/",
     age: 45,
     phone_number: 3234534
@@ -63,12 +64,11 @@ describe('User register', () => {
                 }
                 userId = res.body.user.id
                 console.log(userId)
-                    // console.log(userId)
-                    // console.log(res.body)
+                console.log(res.body)
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
-                expect(res.body.user.phone_number).toEqua(dataRegistrasiNewUser.phone_number)
-                expect(res.body.user.age).toEqua(dataRegistrasiNewUser.age)
+                expect(res.body.user.phone_number).toEqual(dataRegistrasiNewUser.phone_number)
+                expect(res.body.user.age).toEqual(dataRegistrasiNewUser.age)
                 expect(res.body.user.username).toEqua(dataRegistrasiNewUser.username)
                 done()
             })
@@ -108,8 +108,6 @@ describe('User register', () => {
             })
     })
 })
-
-
 
 describe('User loginUser', () => {
     it("should return 200", (done) => {
@@ -160,35 +158,35 @@ describe('User loginUser', () => {
 
 
 describe('User updateUser', () => {
-    // it("should return 200", (done) => {
-    //     request(app).put('/users/update/' + userId)
-    //         .send(updateUser)
-    //         .set('auth', `${token}`)
-    //         .end((error, res) => {
-    //             if (error) done(error)
-    //             expect(res.status).toEqual(200)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         })
-    // })
-
-    it("should return 401", (done) => {
-        request(app).put(`/users/update/${id_not_found}`)
+    it("should return 200", (done) => {
+        request(app).put(`/users/update/${userId}`)
             .send(updateUser)
-            .set('auth', `${token}`)
+            .set('authentication', `${token}`)
             .end((error, res) => {
                 if (error) done(error)
-                token = res.body.token
-                expect(res.status).toEqual(401)
+                expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
                 done()
             })
     })
 
+    // it("should return 401", (done) => {
+    //     request(app).put(`/users/update/${id_not_found}`)
+    //         .send(updateUser)
+    //         .set('authentication', `${token}`)
+    //         .end((error, res) => {
+    //             if (error) done(error)
+    //             token = res.body.token
+    //             expect(res.status).toEqual(401)
+    //             expect(typeof res.body).toEqual("object")
+    //             done()
+    //         })
+    // })
+
     // it("should return 503", (done) => {
     //     request(app).put(`/users/update/fgsd4`)
     //         .send(updateUser)
-    //         .set('auth', `${token}`)
+    //         .set('authentication', `${token}`)
     //         .end((error, res) => {
     //             if (error) done(error)
     //             token = res.body.token
@@ -201,22 +199,22 @@ describe('User updateUser', () => {
 
 
 describe('User deleteUser', () => {
-    // it("should return 200", (done) => {
-    //     request(app).delete(`/users/delete/${userId}`)
-    //         .send(updateUser)
-    //         .set('auth', `${token}`)
-    //         .end((error, res) => {
-    //             if (error) done(error)
-    //             expect(res.status).toEqual(200)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         })
-    // })
+    it("should return 200", (done) => {
+        request(app).delete(`/users/delete/${userId}`)
+            .send(updateUser)
+            .set('auth', `${token}`)
+            .end((error, res) => {
+                if (error) done(error)
+                expect(res.status).toEqual(200)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+    })
 
     it("should return 401", (done) => {
         request(app).delete(`/users/delete/${id_not_found}`)
             .send(updateUser)
-            .set('auth', `${token}`)
+            .set('authentication', `${token}`)
             .end((error, res) => {
                 if (error) done(error)
                 token = res.body.token
@@ -226,20 +224,19 @@ describe('User deleteUser', () => {
             })
     })
 
-    // it("should return 503", (done) => {
-    //     request(app).delete(`/users/delete/fgsd4`)
-    //         .send(updateUser)
-    //         .set('auth', `${token}`)
-    //         .end((error, res) => {
-    //             if (error) done(error)
-    //             token = res.body.token
-    //             expect(res.status).toEqual(503)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         })
-    // })
+    it("should return 503", (done) => {
+        request(app).delete(`/users/delete/fgsd4`)
+            .send(updateUser)
+            .set('authentication', `${token}`)
+            .end((error, res) => {
+                if (error) done(error)
+                token = res.body.token
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+    })
 })
-
 
 afterAll((done) => {
     sequelize.queryInterface.bulkDelete('users', null, {

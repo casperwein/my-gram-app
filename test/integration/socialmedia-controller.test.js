@@ -115,6 +115,7 @@ describe('socialmedia updatesocialmedia', () => {
     it("should return 401 status code", (done) => {
         request(app).put(`/socialmedias/${id_not_found}`)
             .set('authentication', `${ token }`)
+            .send(socialMediaData)
             .then(res => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
