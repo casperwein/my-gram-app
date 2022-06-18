@@ -23,7 +23,7 @@ const userDataFailedlogin = {
 let userId = ''
 const id_not_found = 0
 let token = ''
-const notAuthorized = 1
+const notAuthorized = 2
 
 const dataRegistrasiFailed = {
     full_name: "dimas",
@@ -62,14 +62,11 @@ describe('User register', () => {
                 if (err) {
                     done(err)
                 }
-                userId = res.body.user.id
-                console.log(userId)
-                console.log(res.body)
                 expect(res.status).toEqual(201)
                 expect(typeof res.body).toEqual("object")
                 expect(res.body.user.phone_number).toEqual(dataRegistrasiNewUser.phone_number)
                 expect(res.body.user.age).toEqual(dataRegistrasiNewUser.age)
-                expect(res.body.user.username).toEqua(dataRegistrasiNewUser.username)
+                expect(res.body.user.username).toEqual(dataRegistrasiNewUser.username)
                 done()
             })
     })
@@ -116,6 +113,9 @@ describe('User loginUser', () => {
             .end((error, res) => {
                 if (error) done(error)
                 token = res.body.token
+                jwt.verify(token, secretKey, (err, decoded) => {
+                    userId = decoded.id
+                });
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
                 expect(typeof res.body.token).toEqual("string")
@@ -130,7 +130,6 @@ describe('User loginUser', () => {
             .send(userDataFailed)
             .end((error, res) => {
                 if (error) done(error)
-                token = res.body.token
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
                 expect(typeof res.body).not.toEqual("string")
@@ -162,39 +161,49 @@ describe('User updateUser', () => {
         request(app).put(`/users/update/${userId}`)
             .send(updateUser)
             .set('authentication', `${token}`)
-            .end((error, res) => {
-                if (error) done(error)
+            .then((res) => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
                 done()
             })
+            .catch(error => done(error))
     })
 
-    // it("should return 401", (done) => {
-    //     request(app).put(`/users/update/${id_not_found}`)
-    //         .send(updateUser)
-    //         .set('authentication', `${token}`)
-    //         .end((error, res) => {
-    //             if (error) done(error)
-    //             token = res.body.token
-    //             expect(res.status).toEqual(401)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         })
-    // })
+    it("should return 401", (done) => {
+        request(app).put(`/users/update/${id_not_found}`)
+            .send(updateUser)
+            .set('authentication', `${token}`)
+            .then((res) => {
+                expect(res.status).toEqual(401)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+            .catch(error => done(error))
+    })
 
-    // it("should return 503", (done) => {
-    //     request(app).put(`/users/update/fgsd4`)
-    //         .send(updateUser)
-    //         .set('authentication', `${token}`)
-    //         .end((error, res) => {
-    //             if (error) done(error)
-    //             token = res.body.token
-    //             expect(res.status).toEqual(503)
-    //             expect(typeof res.body).toEqual("object")
-    //             done()
-    //         })
-    // })
+    it("should return 402", (done) => {
+        request(app).put(`/users/update/${notAuthorized}`)
+            .send(updateUser)
+            .set('authentication', `${token}`)
+            .then((res) => {
+                expect(res.status).toEqual(402)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+            .catch(error => done(error))
+    })
+
+    it("should return 503", (done) => {
+        request(app).put(`/users/update/fgsd4`)
+            .send(updateUser)
+            .set('authentication', `${token}`)
+            .then((res) => {
+                expect(res.status).toEqual(503)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+            .catch(error => done(error))
+    })
 })
 
 
@@ -203,46 +212,56 @@ describe('User deleteUser', () => {
         request(app).delete(`/users/delete/${userId}`)
             .send(updateUser)
             .set('auth', `${token}`)
-            .end((error, res) => {
-                if (error) done(error)
+            .then((res) => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
                 done()
             })
+            .catch(error => done(error))
     })
 
     it("should return 401", (done) => {
         request(app).delete(`/users/delete/${id_not_found}`)
             .send(updateUser)
             .set('authentication', `${token}`)
-            .end((error, res) => {
-                if (error) done(error)
-                token = res.body.token
+            .then((res) => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
                 done()
             })
+            .catch(error => done(error))
+    })
+
+    it("should return 402", (done) => {
+        request(app).delete(`/users/delete/${notAuthorized}`)
+            .send(updateUser)
+            .set('authentication', `${token}`)
+            .then((res) => {
+                expect(res.status).toEqual(402)
+                expect(typeof res.body).toEqual("object")
+                done()
+            })
+            .catch(error => done(error))
     })
 
     it("should return 503", (done) => {
         request(app).delete(`/users/delete/fgsd4`)
             .send(updateUser)
             .set('authentication', `${token}`)
-            .end((error, res) => {
-                if (error) done(error)
-                token = res.body.token
+            .then((res) => {
                 expect(res.status).toEqual(503)
                 expect(typeof res.body).toEqual("object")
                 done()
             })
+            .catch(error => done(error))
     })
 })
 
-afterAll((done) => {
-    sequelize.queryInterface.bulkDelete('users', null, {
-            truncate: true,
-            restartIdentity: true
-        })
-        .then(() => done())
-        .catch(error => done(error))
-})
+// afterAll((done) => {
+//     sequelize.queryInterface.bulkDelete('users', null, {
+//             truncate: true,
+//             restartIdentity: true
+//         })
+//         .then(() => done())
+//         .catch(error => done(error))
+// })

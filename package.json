@@ -7,8 +7,8 @@
         "test": "NODE_ENV=test npx jest --detectOpenHandles",
         "start": "node index.js",
         "db": "npx sequelize db:migrate",
-        "undo:all": "npx sequelize db:migrate:undo:all",
-        "seed:all": "npx sequelize db:seed:all",
+        "undo": "npx sequelize db:migrate:undo:all",
+        "seed": "npx sequelize db:seed:all",
         "db:create:test": "NODE_ENV=test npx sequelize db:create",
         "db:migrate:test": "NODE_ENV=test npx sequelize db:migrate"
     },
