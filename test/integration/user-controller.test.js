@@ -164,6 +164,9 @@ describe('User updateUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
+                expect(res.body.user.phone_number).toEqual(updateUser.phone_number)
+                expect(res.body.user.age).toEqual(updateUser.age)
+                expect(res.body.user.username).toEqual(updateUser.username)
                 done()
             })
             .catch(error => done(error))
@@ -176,6 +179,8 @@ describe('User updateUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
                 done()
             })
             .catch(error => done(error))
@@ -188,6 +193,9 @@ describe('User updateUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(402)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.status).toEqual("number")
+                expect(res.body.name).toEqual("authorization error")
+                expect(typeof res.body.name).toEqual("string")
                 done()
             })
             .catch(error => done(error))
@@ -200,6 +208,9 @@ describe('User updateUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(503)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
                 done()
             })
             .catch(error => done(error))
@@ -215,6 +226,9 @@ describe('User deleteUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(200)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(res.body.message).toEqual("Your account has been succesfully deleted")
+                expect(typeof res.status).toEqual("number")
                 done()
             })
             .catch(error => done(error))
@@ -227,6 +241,8 @@ describe('User deleteUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(401)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
                 done()
             })
             .catch(error => done(error))
@@ -239,6 +255,9 @@ describe('User deleteUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(402)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.status).toEqual("number")
+                expect(res.body.name).toEqual("authorization error")
+                expect(typeof res.body.name).toEqual("string")
                 done()
             })
             .catch(error => done(error))
@@ -251,17 +270,20 @@ describe('User deleteUser', () => {
             .then((res) => {
                 expect(res.status).toEqual(503)
                 expect(typeof res.body).toEqual("object")
+                expect(typeof res.body.message).toEqual("string")
+                expect(typeof res.body.message).not.toEqual("number")
+                expect(typeof res.status).toEqual("number")
                 done()
             })
             .catch(error => done(error))
     })
 })
 
-// afterAll((done) => {
-//     sequelize.queryInterface.bulkDelete('users', null, {
-//             truncate: true,
-//             restartIdentity: true
-//         })
-//         .then(() => done())
-//         .catch(error => done(error))
-// })
+afterAll((done) => {
+    sequelize.queryInterface.bulkDelete('users', null, {
+            truncate: true,
+            restartIdentity: true
+        })
+        .then(() => done())
+        .catch(error => done(error))
+})
