@@ -6,10 +6,8 @@ const SocialMedia = require("../models/index").socialmedia;
 const userAuthorization = async(req, res, next) => {
     const userId = req.params.userId;
     const user_id = req.id;
-    console.log(userId)
-    console.log(user_id)
 
-    await User.findOne({ where: { id: user_id } })
+    await User.findOne({ where: { id: userId } })
         .then((user) => {
             if (!user) {
                 res.status(401).json({
